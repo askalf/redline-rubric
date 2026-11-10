@@ -1,0 +1,25 @@
+# After each Scorecard run: checks that its result reached scorecard.dev, and dispatches Scorecard
+# once more when it did not. scorecard-action reports a failed publish as a warning on a green run,
+# so a stale score would otherwise show nothing red. The check is askalf/ci's
+# scorecard-publish-check action, called at a pinned commit.
+# It is a workflow of its own because scorecard.dev accepts results only from a job whose steps it
+# recognises, so the check cannot be a step of scorecard.yml.
+name: Scorecard publish check
+
+on:
+  workflow_run:
+    workflows: [Scorecard]
+    types: [completed]
+
+permissions: {}
+
+jobs:
+  check:
+    # A failed run is already red.
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: write # the one dispatch of the Scorecard workflow
+    steps:
+      - uses: askalf/ci/actions/scorecard-publish-check@f5e6eda079607f787c800899f0d27ddc1f28f99f # main 2026-11-10
