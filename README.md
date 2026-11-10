@@ -23,6 +23,8 @@ one to start from.
 This repository runs that setup on its own pull requests, with `rubric.md` unedited as the prompt:
 [`redline.yml`](.github/workflows/redline.yml) and
 [`redline-post.yml`](.github/workflows/redline-post.yml) are a working copy of the two callers.
+The review here reads on `claude-fable-5-1` at the default endpoint; the `model` input in
+`redline.yml` sets it.
 
 Keep your edited copy out of the repository it reviews. A rubric the author of a pull request can
 read is one they can write to, and one they can change in the pull request is no rubric at all. A
