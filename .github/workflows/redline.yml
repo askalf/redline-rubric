@@ -1,0 +1,54 @@
+# Redline reviews this repository's own pull requests in hosted mode, on a GitHub-hosted runner,
+# with rubric.md as its prompt (stored as the REDLINE_PROMPT secret). The setup is the one in
+# https://github.com/askalf/ci/blob/main/docs/hosted-quickstart.md, so this file doubles as a
+# working copy of it.
+name: Redline
+# The post finds a dispatched review by this title; keep it exact.
+run-name: ${{ github.event_name == 'workflow_dispatch' && format('Redline review {0}#{1} @ {2}{3}', github.repository, inputs.pr, inputs.head, inputs.reread && ' (re-read)' || '') || github.event.pull_request.title }}
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: Pull request number.
+        required: true
+        type: string
+      head:
+        description: The full commit sha to review. The run fails if the PR is not at it.
+        required: true
+        type: string
+      reread:
+        description: Review the head again even when a Redline verdict already stands there.
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  actions: read
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: redline-${{ github.event_name }}-${{ github.event.pull_request.number || inputs.pr }}${{ inputs.head && format('-{0}-{1}', inputs.head, inputs.reread) || '' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  review:
+    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.draft == false && github.event.pull_request.head.repo.full_name == github.repository)
+    # The uses pin and redline-ref are one commit of askalf/ci's main; move them together.
+    uses: askalf/ci/.github/workflows/redline-review.yml@f5e6eda079607f787c800899f0d27ddc1f28f99f
+    with:
+      redline-ref: f5e6eda079607f787c800899f0d27ddc1f28f99f
+      hosted-runner: ubuntu-latest
+      # Read at the default endpoint, https://api.anthropic.com, with REDLINE_MODEL_API_KEY.
+      model: claude-fable-5-1
+      reviewer-login: sprayberry-redline
+      dispatch-actor: askalf
+      pr: ${{ inputs.pr }}
+      head: ${{ inputs.head }}
+      reread: ${{ inputs.reread == true }}
+    secrets:
+      model-api-key: ${{ secrets.REDLINE_MODEL_API_KEY }}
+      reviewer-prompt: ${{ secrets.REDLINE_PROMPT }}
