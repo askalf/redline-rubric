@@ -20,6 +20,10 @@ one to start from.
 3. Pass it to the review as `reviewer-prompt`. The caller is in the Redline README, under
    [Without a runner host](https://github.com/askalf/ci#without-a-runner-host).
 
+This repository runs that setup on its own pull requests, with `rubric.md` unedited as the prompt:
+[`redline.yml`](.github/workflows/redline.yml) and
+[`redline-post.yml`](.github/workflows/redline-post.yml) are a working copy of the two callers.
+
 Keep your edited copy out of the repository it reviews. A rubric the author of a pull request can
 read is one they can write to, and one they can change in the pull request is no rubric at all. A
 GitHub secret holds up to 48 KB; this file is about 6 KB.
