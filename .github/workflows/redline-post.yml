@@ -1,0 +1,24 @@
+# Posts a finished Redline verdict on its pull request as the reviewer account. A workflow_run job
+# runs the default branch's copy of this file, never a pull request's.
+name: Redline post
+
+on:
+  workflow_run:
+    workflows: [Redline]
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: read
+  pull-requests: read
+
+jobs:
+  post:
+    # The same commit of askalf/ci's main as redline.yml.
+    uses: askalf/ci/.github/workflows/redline-post-verdict.yml@f5e6eda079607f787c800899f0d27ddc1f28f99f
+    with:
+      redline-ref: f5e6eda079607f787c800899f0d27ddc1f28f99f
+      reviewer-login: sprayberry-redline
+      dispatch-actor: askalf
+    secrets:
+      reviewer-token: ${{ secrets.REDLINE_REVIEWER_TOKEN }}
