@@ -1,0 +1,17 @@
+{
+  "name": "redline-rubric",
+  "private": true,
+  "description": "A starter rubric for Redline's hosted mode, and the check that an edited copy still fits Redline's contract.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "check": "node scripts/check-rubric.mjs",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "fast-check": "4.10.2"
+  }
+}

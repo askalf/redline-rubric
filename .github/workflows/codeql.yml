@@ -27,8 +27,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # The workflows are the code of this repository: everything else is Markdown.
-        language: [actions]
+        # The code of this repository: its workflows, and the rubric checker with its tests.
+        language: [actions, javascript-typescript]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
