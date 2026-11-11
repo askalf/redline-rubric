@@ -1,6 +1,7 @@
 # redline-rubric
 
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/askalf/redline-rubric/badge)](https://scorecard.dev/viewer/?uri=github.com/askalf/redline-rubric)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/16571/badge)](https://www.bestpractices.dev/projects/16571)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 A starter rubric for [Redline](https://github.com/askalf/ci), the AI code review that gates a pull

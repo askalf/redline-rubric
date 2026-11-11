@@ -10,6 +10,7 @@ the copy, so the commit they copied from is the version; this log names the pull
 
 ## November 2026
 
+- The OpenSSF Best Practices badge, at the passing level, is shown in the README (#9).
 - A contributing guide and this changelog (#8).
 - A checker for edited rubrics. `node scripts/check-rubric.mjs your-rubric.md` fails a rubric that
   would not fit in a GitHub secret, one that names a `redline_` tool Redline does not have, and one
