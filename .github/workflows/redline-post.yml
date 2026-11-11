@@ -2,7 +2,8 @@
 # (redline.yml) runs the workflow files a pull request brings with it, so it never holds the
 # reviewer token and leaves its verdict with posted: false. This job runs on workflow_run, which
 # always runs the default branch's copy of this file, never a pull request's, on GitHub's runners,
-# and posts only when every rule in askalf/ci's scripts/redline/post.mjs holds.
+# and posts only when every rule in askalf/ci's scripts/redline/post.mjs holds. The second lens's
+# verdict, when the run carries one, is posted the same way as sprayberry-secondread.
 name: Redline post
 
 on:
@@ -11,7 +12,7 @@ on:
     types: [completed]
 
 # The called workflow's job token reads the run, its artifact, redline.yml and the PR. The post
-# itself uses REDLINE_REVIEWER_TOKEN.
+# itself uses REDLINE_REVIEWER_TOKEN, and the second lens's REDLINE_SECOND_REVIEWER_TOKEN.
 permissions:
   actions: read
   contents: read
@@ -20,8 +21,10 @@ permissions:
 jobs:
   post:
     # Pinned so a change to the post reaches this repository only through a reviewed bump here.
-    uses: askalf/ci/.github/workflows/redline-post-verdict.yml@19e815912eb0dc85202723bb42c0e76f4786c157 # main 2026-11-10, askalf/ci#205
+    uses: askalf/ci/.github/workflows/redline-post-verdict.yml@f972757106870f38be99036645f3be869aac820f # main 2026-11-11, askalf/ci#207
     with:
-      redline-ref: 19e815912eb0dc85202723bb42c0e76f4786c157
+      redline-ref: f972757106870f38be99036645f3be869aac820f
+      second-reviewer-login: sprayberry-secondread
     secrets:
       reviewer-token: ${{ secrets.REDLINE_REVIEWER_TOKEN }}
+      second-reviewer-token: ${{ secrets.REDLINE_SECOND_REVIEWER_TOKEN }}

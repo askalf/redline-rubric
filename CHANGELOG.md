@@ -10,6 +10,10 @@ the copy, so the commit they copied from is the version; this log names the pull
 
 ## November 2026
 
+- This repository's pull requests get a second read. Every head Redline approves is read once
+  more, as `sprayberry-secondread`, on another vendor's model with a narrower rubric: security and
+  supply chain only. A pull request that only moves pins is approved by the second reader without
+  a model call (#10).
 - The OpenSSF Best Practices badge, at the passing level, is shown in the README (#9).
 - A contributing guide and this changelog (#8).
 - A checker for edited rubrics. `node scripts/check-rubric.mjs your-rubric.md` fails a rubric that
