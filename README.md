@@ -45,7 +45,11 @@ every pull request here, and the checker has its own tests in [`test/`](test/), 
 This repository's own pull requests are read the way the other askalf repositories' are, on our
 runner host, so [`redline.yml`](.github/workflows/redline.yml) and
 [`redline-post.yml`](.github/workflows/redline-post.yml) here are the runner-host callers, not a
-copy of the hosted ones.
+copy of the hosted ones. Each head Redline approves is then read once more in the same job by a
+second reviewer account, `sprayberry-secondread`, on another vendor's model with a narrower rubric
+of its own: security and supply chain only. Redline calls that
+[a second lens](https://github.com/askalf/ci/blob/main/scripts/redline/README.md#a-second-lens),
+and it needs a runner host, so the hosted callers do not have it.
 
 Keep your edited copy out of the repository it reviews. A rubric the author of a pull request can
 read is one they can write to, and one they can change in the pull request is no rubric at all. A
