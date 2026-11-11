@@ -23,11 +23,13 @@ one to start from.
 3. Pass it to the review as `reviewer-prompt`. The caller is in the Redline README, under
    [Without a runner host](https://github.com/askalf/ci#without-a-runner-host).
 
-This repository runs that setup on its own pull requests, with `rubric.md` unedited as the prompt:
-[`redline.yml`](.github/workflows/redline.yml) and
-[`redline-post.yml`](.github/workflows/redline-post.yml) are a working copy of the two callers.
-The review here reads on `claude-fable-5-1` at the default endpoint; the `model` input in
-`redline.yml` sets it.
+The [hosted quickstart](https://github.com/askalf/ci/blob/main/docs/hosted-quickstart.md) walks
+through the whole setup, the two callers included.
+
+This repository's own pull requests are read the way the other askalf repositories' are, on our
+runner host, so [`redline.yml`](.github/workflows/redline.yml) and
+[`redline-post.yml`](.github/workflows/redline-post.yml) here are the runner-host callers, not a
+copy of the hosted ones.
 
 Keep your edited copy out of the repository it reviews. A rubric the author of a pull request can
 read is one they can write to, and one they can change in the pull request is no rubric at all. A
