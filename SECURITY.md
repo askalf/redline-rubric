@@ -1,8 +1,9 @@
 # Security Policy
 
-This repository holds a starter rubric for Redline and a working copy of the workflow callers that
-run Redline's hosted mode on its own pull requests. A report that gets one of this repository's
-secrets out of a run, or an approval onto a pull request nobody reviewed, gets priority.
+This repository holds a starter rubric for Redline and the workflow callers that run Redline on its
+own pull requests, on a self-hosted runner. A report that gets one of this repository's secrets out
+of a run, a fork's code onto that runner, or an approval onto a pull request nobody reviewed, gets
+priority.
 
 ## Reporting a vulnerability
 
@@ -23,8 +24,9 @@ Only `main` receives fixes; there are no release branches.
 
 ## In scope
 
-- A workflow in this repository exposing the model key, the stored rubric or the reviewer's token
-  to a log, a run page or a pull request
+- A workflow in this repository exposing one of its secrets, such as the reviewer's token, to a
+  log, a run page or a pull request
+- A pull request from a fork whose review job starts on the self-hosted runner
 - A pull request that gets the reviewer's approval without a review of its head commit
 - A pull request that changes the workflow its own posted review ran from
 

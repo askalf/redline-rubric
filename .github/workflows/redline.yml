@@ -1,9 +1,11 @@
-# Redline reviews this repository's own pull requests in hosted mode, on a GitHub-hosted runner,
-# with rubric.md as its prompt (stored as the REDLINE_PROMPT secret). The setup is the one in
-# https://github.com/askalf/ci/blob/main/docs/hosted-quickstart.md, so this file doubles as a
-# working copy of it.
+# Redline, the gating code review, as this repository's CI check. The review itself lives in
+# askalf/ci (redline-review.yml): read-only tools, verdict pass or fail. On pull_request it reviews
+# same-repository pull requests that are not drafts. It can also be dispatched on the default branch
+# for a head the pull_request run cannot vouch for (a PR that changes CI, a re-read after a
+# description edit); that run executes the default branch's workflow files, not the PR's, and
+# reviews the head it is given.
 name: Redline
-# The post finds a dispatched review by this title; keep it exact.
+# The dispatcher finds its run by this title; keep it exact.
 run-name: ${{ github.event_name == 'workflow_dispatch' && format('Redline review {0}#{1} @ {2}{3}', github.repository, inputs.pr, inputs.head, inputs.reread && ' (re-read)' || '') || github.event.pull_request.title }}
 
 on:
@@ -25,30 +27,32 @@ on:
         default: false
         type: boolean
 
+# actions: read is for the called review's fork-dispatch check, which reads this repository's
+# pull_request runs and jobs; the called workflow cannot hold more than is granted here.
 permissions:
   actions: read
   contents: read
   pull-requests: read
 
+# On pull_request the newest push wins. A dispatch gets a group of its own per head and mode, and
+# is never cancelled: a group holds one pending run and a newer one cancels it, and a cancelled
+# dispatch leaves no verdict to read. One dispatch is sent per head and mode at a time.
 concurrency:
   group: redline-${{ github.event_name }}-${{ github.event.pull_request.number || inputs.pr }}${{ inputs.head && format('-{0}-{1}', inputs.head, inputs.reread) || '' }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   review:
+    # Same-repository PRs only, and not drafts: gated here as well as in the called workflow, so a
+    # fork's code never reaches the self-hosted runner even if the callee changes. A dispatch is
+    # checked by the called workflow (open, not a draft, head in this repository) before anything
+    # is fetched.
     if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.draft == false && github.event.pull_request.head.repo.full_name == github.repository)
-    # The uses pin and redline-ref are one commit of askalf/ci's main; move them together.
-    uses: askalf/ci/.github/workflows/redline-review.yml@f5e6eda079607f787c800899f0d27ddc1f28f99f
+    # Pinned so a change to the review workflow reaches this repository only through a reviewed bump here.
+    uses: askalf/ci/.github/workflows/redline-review.yml@19e815912eb0dc85202723bb42c0e76f4786c157 # main 2026-11-10, askalf/ci#205
     with:
-      redline-ref: f5e6eda079607f787c800899f0d27ddc1f28f99f
-      hosted-runner: ubuntu-latest
-      # Read at the default endpoint, https://api.anthropic.com, with REDLINE_MODEL_API_KEY.
-      model: claude-fable-5-1
-      reviewer-login: sprayberry-redline
-      dispatch-actor: askalf
+      redline-ref: 19e815912eb0dc85202723bb42c0e76f4786c157
+      runner-label: redline
       pr: ${{ inputs.pr }}
       head: ${{ inputs.head }}
       reread: ${{ inputs.reread == true }}
-    secrets:
-      model-api-key: ${{ secrets.REDLINE_MODEL_API_KEY }}
-      reviewer-prompt: ${{ secrets.REDLINE_PROMPT }}

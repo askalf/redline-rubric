@@ -1,7 +1,7 @@
 # The action pins in this repository's workflows. One grouped pull request per week, so a pair that
 # must move together (codeql-action init and analyze) never lands split. The askalf/ci pins
-# (askalf/ci/...@<sha>) have no releases for Dependabot to move to; move those by hand, as the
-# hosted quickstart describes.
+# (askalf/ci/...@<sha>) have no releases for Dependabot to move to; they move to a commit of
+# its main, by askalf/ci's pin bump or by hand.
 version: 2
 updates:
   - package-ecosystem: github-actions
