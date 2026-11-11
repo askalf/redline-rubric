@@ -26,6 +26,21 @@ one to start from.
 The [hosted quickstart](https://github.com/askalf/ci/blob/main/docs/hosted-quickstart.md) walks
 through the whole setup, the two callers included.
 
+## Check your edited copy
+
+Before you store an edited rubric, run it through the checker. It needs Node 20 or newer and
+nothing else:
+
+```sh
+node scripts/check-rubric.mjs path/to/your-rubric.md
+```
+
+It fails a rubric that would not fit in a GitHub secret, one that names a `redline_` tool Redline
+does not have, and one that never names `redline_submit`. It does not judge what the rubric asks
+the reviewer to look for; that part is yours. [`rubric.md`](rubric.md) is held to the same check on
+every pull request here, and the checker has its own tests in [`test/`](test/), run with
+`npm ci && npm test`.
+
 This repository's own pull requests are read the way the other askalf repositories' are, on our
 runner host, so [`redline.yml`](.github/workflows/redline.yml) and
 [`redline-post.yml`](.github/workflows/redline-post.yml) here are the runner-host callers, not a

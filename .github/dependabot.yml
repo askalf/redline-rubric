@@ -1,4 +1,5 @@
-# The action pins in this repository's workflows. One grouped pull request per week, so a pair that
+# The action pins in this repository's workflows, and the one npm development dependency of the
+# rubric checker's tests. One grouped pull request per ecosystem per week, so a pair of actions that
 # must move together (codeql-action init and analyze) never lands split. The askalf/ci pins
 # (askalf/ci/...@<sha>) have no releases for Dependabot to move to; they move to a commit of
 # its main, by askalf/ci's pin bump or by hand.
@@ -12,5 +13,16 @@ updates:
     open-pull-requests-limit: 5
     groups:
       actions:
+        patterns:
+          - "*"
+  # The rubric checker's tests have one development dependency, fast-check.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      npm:
         patterns:
           - "*"
