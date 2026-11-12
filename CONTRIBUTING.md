@@ -55,3 +55,7 @@ many times.
 
 The `test` job and CodeQL on the JavaScript, `analyze (javascript-typescript)`, run on every pull
 request as well.
+
+Each head Redline approves is also read once more by a second reviewer, `sprayberry-secondread`,
+for security and supply chain only. Its review is posted on the pull request. It does not hold a
+merge yet: read it, and fix what it finds, as you would Redline's.
