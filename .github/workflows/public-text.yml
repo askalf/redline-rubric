@@ -19,6 +19,6 @@ concurrency:
 jobs:
   public-text:
     # The uses pin and redline-ref are one commit of askalf/ci's main; move them together.
-    uses: askalf/ci/.github/workflows/public-text.yml@f5e6eda079607f787c800899f0d27ddc1f28f99f
+    uses: askalf/ci/.github/workflows/public-text.yml@00c95732d25ad90c842a901e52100b2993b2f4eb # main 2026-11-12, askalf/ci#213
     with:
-      redline-ref: f5e6eda079607f787c800899f0d27ddc1f28f99f
+      redline-ref: 00c95732d25ad90c842a901e52100b2993b2f4eb
