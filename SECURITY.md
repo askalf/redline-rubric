@@ -25,10 +25,11 @@ Only `main` receives fixes; there are no release branches.
 
 ## In scope
 
-- A workflow in this repository exposing one of its secrets, such as the reviewer's token, to a
-  log, a run page or a pull request
+- A workflow in this repository exposing one of its secrets, such as either reviewer account's
+  token, to a log, a run page or a pull request
 - A pull request from a fork whose review job starts on the self-hosted runner
-- A pull request that gets the reviewer's approval without a review of its head commit
+- A pull request that gets an approval from `sprayberry-redline` or `sprayberry-secondread`
+  without that reviewer having read its head commit
 - A pull request that changes the workflow its own posted review ran from
 
 ## Out of scope
