@@ -6,10 +6,13 @@
 //   - every `redline_` tool it names must be one Redline gives the model. A rubric that tells the
 //     reviewer to call a tool that does not exist costs it turns it does not have;
 //   - it must name `redline_submit`, the call that ends a review. A review that never makes it
-//     ends without a verdict.
+//     ends without a verdict;
+//   - it must not name one of GitHub's other review words (COMMENT, APPROVED, ...) where a verdict
+//     goes. redline_submit takes APPROVE or REQUEST_CHANGES and sends anything else back, so a
+//     rubric that teaches the reviewer to submit COMMENT costs it a turn on every review that does.
 //
-// The tool names are those of askalf/ci's scripts/redline/tools.json. If Redline adds a tool,
-// add it to TOOLS here in the same change that teaches rubric.md to use it.
+// The tool names and the verdicts are those of askalf/ci's scripts/redline/tools.json. If Redline
+// adds a tool or a verdict, add it here in the same change that teaches rubric.md to use it.
 //
 // Usage: node scripts/check-rubric.mjs [file]   (default: rubric.md)
 // Exit 0 when the rubric holds, 1 when it does not, 2 when the file cannot be read.
@@ -20,22 +23,31 @@ import { pathToFileURL } from 'node:url';
 export const TOOLS = Object.freeze(['redline_diff', 'redline_list', 'redline_read', 'redline_search', 'redline_submit']);
 export const SUBMIT_TOOL = 'redline_submit';
 export const MAX_BYTES = 48 * 1024;
+// redline_submit's `verdict`, an enum in tools.json.
+export const VERDICTS = Object.freeze(['APPROVE', 'REQUEST_CHANGES']);
+// GitHub's words for a review that are not among them: the COMMENT event, and the states GitHub
+// shows a review in. A rubric written from GitHub's API can name one as the verdict to give.
+export const NOT_VERDICTS = Object.freeze(['CHANGES_REQUESTED', 'COMMENTED', 'APPROVED', 'COMMENT']);
 
 // A tool name as the model would read it: `redline_` and what follows, not part of a longer word.
 // Case matters, since a tool call is matched by its exact name, so REDLINE_PROMPT (the usual name
 // of the secret) is not a tool name and Redline_Submit is not the submit tool. The bare prefix,
 // as in "the `redline_` tools", names no tool and is left alone.
 const TOOL_NAME = /(?<![A-Za-z0-9_])redline_[A-Za-z0-9_]+/g;
+// One of those words, whole and in capitals, as a verdict is written. In lower case, as in "a
+// comment" or "approved changes", it is prose and names no verdict.
+const NOT_VERDICT = new RegExp(`(?<![A-Za-z0-9_])(?:${NOT_VERDICTS.join('|')})(?![A-Za-z0-9_])`, 'g');
 
 /**
  * @param {string} text the rubric
- * @returns {{ ok: boolean, bytes: number, tools: string[], problems: { code: string, message: string }[] }}
+ * @returns {{ ok: boolean, bytes: number, tools: string[], verdicts: string[], problems: { code: string, message: string }[] }}
  */
 export function checkRubric(text) {
   if (typeof text !== 'string') throw new TypeError('checkRubric takes the rubric as a string');
   const problems = [];
   const bytes = Buffer.byteLength(text, 'utf8');
   const tools = [...new Set(text.match(TOOL_NAME) ?? [])].sort();
+  const verdicts = [...new Set(text.match(NOT_VERDICT) ?? [])].sort();
 
   if (text.trim() === '') {
     problems.push({ code: 'empty', message: 'the rubric is empty' });
@@ -51,7 +63,10 @@ export function checkRubric(text) {
   if (!tools.includes(SUBMIT_TOOL)) {
     problems.push({ code: 'no-submit', message: `the rubric never names ${SUBMIT_TOOL}, the call that ends a review` });
   }
-  return { ok: problems.length === 0, bytes, tools, problems };
+  for (const word of verdicts) {
+    problems.push({ code: 'not-a-verdict', message: `the rubric names ${word}, which is not a verdict ${SUBMIT_TOOL} takes (${VERDICTS.join(', ')})` });
+  }
+  return { ok: problems.length === 0, bytes, tools, verdicts, problems };
 }
 
 function main(argv) {

@@ -10,18 +10,20 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import fc from 'fast-check';
 
-import { checkRubric, TOOLS, SUBMIT_TOOL, MAX_BYTES } from '../scripts/check-rubric.mjs';
+import { checkRubric, TOOLS, SUBMIT_TOOL, MAX_BYTES, VERDICTS, NOT_VERDICTS } from '../scripts/check-rubric.mjs';
 
 const RUNS = Number(process.env.RUBRIC_FUZZ_RUNS) > 0 ? Number(process.env.RUBRIC_FUZZ_RUNS) : undefined;
 const runs = (n) => ({ numRuns: RUNS ?? n });
-const CODES = new Set(['empty', 'too-large', 'unknown-tool', 'no-submit']);
+const CODES = new Set(['empty', 'too-large', 'unknown-tool', 'no-submit', 'not-a-verdict']);
 const codes = (text) => checkRubric(text).problems.map((p) => p.code);
 const at = (rel) => fileURLToPath(new URL(rel, import.meta.url));
 const script = at('../scripts/check-rubric.mjs');
 const rubric = at('../rubric.md');
 
-// Text that cannot hold a tool name by accident: no underscore, so `redline_` never forms.
-const plain = fc.string({ unit: 'grapheme', maxLength: 400 }).map((s) => s.replaceAll('_', ' '));
+// Text that cannot hold a tool name by accident: no underscore, so `redline_` never forms. Nor
+// one of GitHub's other review words in capitals, which the generator could in principle spell.
+const plain = fc.string({ unit: 'grapheme', maxLength: 400 }).map((s) => s.replaceAll('_', ' '))
+  .filter((s) => !NOT_VERDICTS.some((w) => s.includes(w)));
 // What can follow `redline_` in a name.
 const suffix = fc.stringMatching(/^[A-Za-z0-9_]{1,24}$/);
 
@@ -29,6 +31,7 @@ test('the rubric this repository ships holds', () => {
   const result = checkRubric(readFileSync(rubric, 'utf8'));
   assert.deepEqual(result.problems, []);
   assert.deepEqual(result.tools, [...TOOLS].sort(), 'it names every tool, and only tools that exist');
+  assert.deepEqual(result.verdicts, [], 'it names no verdict redline_submit refuses');
   assert.ok(result.bytes < MAX_BYTES);
 });
 
@@ -45,6 +48,12 @@ test('plain cases', () => {
   assert.deepEqual(codes('See myredline_tool and redline_submit.'), [], 'part of a longer word is not a tool name');
   assert.deepEqual(codes('The `redline_` tools end with redline_submit.'), [], 'the bare prefix names no tool');
   assert.deepEqual(codes('redline_x and redline_submit'), ['unknown-tool']);
+  assert.deepEqual(codes('End with redline_submit: APPROVE or REQUEST_CHANGES.'), [], 'the two verdicts it takes');
+  assert.deepEqual(codes('If unsure, end with redline_submit and COMMENT.'), ['not-a-verdict']);
+  assert.deepEqual(codes('End with redline_submit: APPROVED or CHANGES_REQUESTED.'), ['not-a-verdict', 'not-a-verdict']);
+  assert.deepEqual(codes('Leave a comment; approved changes end with redline_submit.'), [], 'in lower case the words are prose');
+  assert.deepEqual(codes('End with redline_submit. NOCOMMENT and COMMENTS are not review words.'), [], 'part of a longer word is not one');
+  assert.match(checkRubric('Submit COMMENTED with redline_submit.').problems[0].message, /names COMMENTED, which is not a verdict redline_submit takes \(APPROVE, REQUEST_CHANGES\)/);
   assert.throws(() => checkRubric(undefined), TypeError);
   assert.throws(() => checkRubric(Buffer.from('redline_submit')), TypeError);
 });
@@ -119,6 +128,22 @@ test('property: the size rule follows the byte length and nothing else', () => {
     const result = checkRubric(text);
     assert.equal(result.problems.some((p) => p.code === 'too-large'), result.bytes > MAX_BYTES);
   }), runs(300));
+});
+
+test("property: each of GitHub's other review words is reported once, by name, wherever it stands", () => {
+  const words = fc.subarray([...NOT_VERDICTS], { minLength: 1 });
+  const gaps = fc.array(plain, { minLength: 5, maxLength: 5 });
+  fc.assert(fc.property(words, gaps, fc.boolean(), (named, gap, twice) => {
+    const said = twice ? [...named, ...named] : named;
+    const text = said.map((w, i) => `${gap[i % 4]} ${w} `).join('') + `${gap[4]} ${SUBMIT_TOOL}`;
+    const result = checkRubric(text);
+    assert.deepEqual(result.verdicts, [...named].sort());
+    const reported = result.problems.filter((p) => p.code === 'not-a-verdict');
+    assert.equal(reported.length, named.length);
+    for (const w of named) assert.ok(reported.some((p) => p.message.includes(`names ${w},`)));
+    assert.deepEqual(result.problems.filter((p) => p.code !== 'not-a-verdict'), []);
+  }), runs(500));
+  for (const v of VERDICTS) assert.deepEqual(codes(`${v} ${SUBMIT_TOOL}`), [], `${v} is a verdict`);
 });
 
 test('the command line: exit 0 on a rubric that holds, 1 on one that does not, 2 on a missing file', () => {
