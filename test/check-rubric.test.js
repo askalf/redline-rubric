@@ -51,6 +51,11 @@ test('plain cases', () => {
   assert.deepEqual(codes('End with redline_submit: APPROVE or REQUEST_CHANGES.'), [], 'the two verdicts it takes');
   assert.deepEqual(codes('If unsure, end with redline_submit and COMMENT.'), ['not-a-verdict']);
   assert.deepEqual(codes('End with redline_submit: APPROVED or CHANGES_REQUESTED.'), ['not-a-verdict', 'not-a-verdict']);
+  assert.deepEqual(codes('Finish with redline_submit using PENDING.'), ['not-a-verdict']);
+  assert.deepEqual(codes('A DISMISSED review ends with redline_submit again.'), ['not-a-verdict']);
+  assert.deepEqual([...VERDICTS, ...NOT_VERDICTS].sort(),
+    ['APPROVE', 'APPROVED', 'CHANGES_REQUESTED', 'COMMENT', 'COMMENTED', 'DISMISSED', 'PENDING', 'REQUEST_CHANGES'],
+    "between them the two lists hold GitHub's three review events and five review states");
   assert.deepEqual(codes('Leave a comment; approved changes end with redline_submit.'), [], 'in lower case the words are prose');
   assert.deepEqual(codes('GitHub can show a COMMENTED review; submit APPROVE or REQUEST_CHANGES with redline_submit.'), ['not-a-verdict'],
     'in capitals the word fails wherever it stands, even where the sentence says it is not a verdict');

@@ -38,7 +38,8 @@ node scripts/check-rubric.mjs path/to/your-rubric.md
 
 It fails a rubric that would not fit in a GitHub secret, one that names a `redline_` tool Redline
 does not have, one that never names `redline_submit`, and one that names GitHub's other review
-words (`COMMENT`, `APPROVED`, `CHANGES_REQUESTED`, `COMMENTED`) in capitals anywhere, since
+words (`COMMENT`, `APPROVED`, `CHANGES_REQUESTED`, `COMMENTED`, `DISMISSED`, `PENDING`) in
+capitals anywhere, since
 `redline_submit` takes `APPROVE` or `REQUEST_CHANGES` and sends anything else back. It does not read
 what the sentence around such a word asks, so a rubric that only mentions one writes it in lower
 case. It does not judge what the rubric asks

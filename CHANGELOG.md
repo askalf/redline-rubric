@@ -11,8 +11,8 @@ the copy, so the commit they copied from is the version; this log names the pull
 ## November 2026
 
 - The checker also fails a rubric that names one of GitHub's other review words, `COMMENT`,
-  `APPROVED`, `CHANGES_REQUESTED` or `COMMENTED`, in capitals anywhere in it; in lower case they are
-  left alone.
+  `APPROVED`, `CHANGES_REQUESTED`, `COMMENTED`, `DISMISSED` or `PENDING`, in capitals anywhere in
+  it; in lower case they are left alone.
   `redline_submit` takes `APPROVE` or `REQUEST_CHANGES` and sends anything else back to the
   reviewer, so a rubric that teaches another word costs a turn on each review that uses it.
 - This repository's pull requests get a second read. Every head Redline approves is read once

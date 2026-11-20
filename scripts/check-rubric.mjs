@@ -28,9 +28,10 @@ export const SUBMIT_TOOL = 'redline_submit';
 export const MAX_BYTES = 48 * 1024;
 // redline_submit's `verdict`, an enum in tools.json.
 export const VERDICTS = Object.freeze(['APPROVE', 'REQUEST_CHANGES']);
-// GitHub's words for a review that are not among them: the COMMENT event, and the states GitHub
-// shows a review in. A rubric written from GitHub's API can name one as the verdict to give.
-export const NOT_VERDICTS = Object.freeze(['CHANGES_REQUESTED', 'COMMENTED', 'APPROVED', 'COMMENT']);
+// The rest of GitHub's words for a review: of its three review events (APPROVE, REQUEST_CHANGES,
+// COMMENT) the one redline_submit refuses, and all five of its review states. A rubric written from
+// GitHub's API can name any of them as the verdict to give.
+export const NOT_VERDICTS = Object.freeze(['CHANGES_REQUESTED', 'COMMENTED', 'DISMISSED', 'APPROVED', 'PENDING', 'COMMENT']);
 
 // A tool name as the model would read it: `redline_` and what follows, not part of a longer word.
 // Case matters, since a tool call is matched by its exact name, so REDLINE_PROMPT (the usual name
