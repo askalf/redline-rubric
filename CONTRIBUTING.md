@@ -38,8 +38,9 @@ many times.
 3. A change to `scripts/check-rubric.mjs` needs a test in `test/check-rubric.test.js`. A new rule
    needs a plain case and a property; a changed rule needs the test that would have failed before.
 4. A change to `rubric.md` must still pass `node scripts/check-rubric.mjs rubric.md`.
-5. If Redline gains or loses a tool, change `TOOLS` in the checker and the tool list in `rubric.md`
-   in the same pull request, and name the askalf/ci change in the description.
+5. If Redline gains or loses a tool or a verdict, change `TOOLS` or `VERDICTS` in the checker and
+   the list in `rubric.md` in the same pull request, and name the askalf/ci change in the
+   description.
 6. Add a line to [CHANGELOG.md](CHANGELOG.md) for anything an adopter of the rubric would want to
    know.
 7. Run `npm test` before pushing, then open a pull request against `main`.

@@ -37,7 +37,12 @@ node scripts/check-rubric.mjs path/to/your-rubric.md
 ```
 
 It fails a rubric that would not fit in a GitHub secret, one that names a `redline_` tool Redline
-does not have, and one that never names `redline_submit`. It does not judge what the rubric asks
+does not have, one that never names `redline_submit`, and one that names GitHub's other review
+words (`COMMENT`, `APPROVED`, `CHANGES_REQUESTED`, `COMMENTED`, `DISMISSED`, `PENDING`) in
+capitals anywhere, since
+`redline_submit` takes `APPROVE` or `REQUEST_CHANGES` and sends anything else back. It does not read
+what the sentence around such a word asks, so a rubric that only mentions one writes it in lower
+case. It does not judge what the rubric asks
 the reviewer to look for; that part is yours. [`rubric.md`](rubric.md) is held to the same check on
 every pull request here, and the checker has its own tests in [`test/`](test/), run with
 `npm ci && npm test`.
@@ -61,7 +66,7 @@ The rubric talks to the contract Redline gives the model, which is public:
 
 - the tools in [`scripts/redline/tools.json`](https://github.com/askalf/ci/blob/main/scripts/redline/tools.json):
   `redline_diff`, `redline_list`, `redline_read`, `redline_search`, and `redline_submit`, which
-  ends the review;
+  ends the review with `APPROVE` or `REQUEST_CHANGES`;
 - the rules `review.mjs` enforces whatever a rubric says: a finding must quote text from the diff,
   the pull request's text or a commit message; a blocking finding always requests changes; a
   `reads-as-generated` finding, and a `misleading-text` finding on the description, never block.
