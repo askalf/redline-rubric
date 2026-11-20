@@ -52,6 +52,8 @@ test('plain cases', () => {
   assert.deepEqual(codes('If unsure, end with redline_submit and COMMENT.'), ['not-a-verdict']);
   assert.deepEqual(codes('End with redline_submit: APPROVED or CHANGES_REQUESTED.'), ['not-a-verdict', 'not-a-verdict']);
   assert.deepEqual(codes('Leave a comment; approved changes end with redline_submit.'), [], 'in lower case the words are prose');
+  assert.deepEqual(codes('GitHub can show a COMMENTED review; submit APPROVE or REQUEST_CHANGES with redline_submit.'), ['not-a-verdict'],
+    'in capitals the word fails wherever it stands, even where the sentence says it is not a verdict');
   assert.deepEqual(codes('End with redline_submit. NOCOMMENT and COMMENTS are not review words.'), [], 'part of a longer word is not one');
   assert.match(checkRubric('Submit COMMENTED with redline_submit.').problems[0].message, /names COMMENTED, which is not a verdict redline_submit takes \(APPROVE, REQUEST_CHANGES\)/);
   assert.throws(() => checkRubric(undefined), TypeError);

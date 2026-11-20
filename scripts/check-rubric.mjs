@@ -7,9 +7,12 @@
 //     reviewer to call a tool that does not exist costs it turns it does not have;
 //   - it must name `redline_submit`, the call that ends a review. A review that never makes it
 //     ends without a verdict;
-//   - it must not name one of GitHub's other review words (COMMENT, APPROVED, ...) where a verdict
-//     goes. redline_submit takes APPROVE or REQUEST_CHANGES and sends anything else back, so a
-//     rubric that teaches the reviewer to submit COMMENT costs it a turn on every review that does.
+//   - it must not name one of GitHub's other review words (COMMENT, APPROVED, ...) in capitals,
+//     anywhere in it. redline_submit takes APPROVE or REQUEST_CHANGES and sends anything else back,
+//     so a rubric that teaches the reviewer to submit COMMENT costs it a turn on every review that
+//     does. The check does not read what a sentence asks for: it fails such a word wherever it
+//     stands, even in a sentence that says it is not a verdict. A rubric that must mention one
+//     writes it in lower case.
 //
 // The tool names and the verdicts are those of askalf/ci's scripts/redline/tools.json. If Redline
 // adds a tool or a verdict, add it here in the same change that teaches rubric.md to use it.
@@ -34,8 +37,8 @@ export const NOT_VERDICTS = Object.freeze(['CHANGES_REQUESTED', 'COMMENTED', 'AP
 // of the secret) is not a tool name and Redline_Submit is not the submit tool. The bare prefix,
 // as in "the `redline_` tools", names no tool and is left alone.
 const TOOL_NAME = /(?<![A-Za-z0-9_])redline_[A-Za-z0-9_]+/g;
-// One of those words, whole and in capitals, as a verdict is written. In lower case, as in "a
-// comment" or "approved changes", it is prose and names no verdict.
+// One of those words, whole and in capitals, anywhere in the text. In lower case, as in "a comment"
+// or "approved changes", it is left alone.
 const NOT_VERDICT = new RegExp(`(?<![A-Za-z0-9_])(?:${NOT_VERDICTS.join('|')})(?![A-Za-z0-9_])`, 'g');
 
 /**
